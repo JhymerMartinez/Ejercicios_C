@@ -60,7 +60,7 @@ void obtener_matriz(string matriz[50][50], int rango[3]) {
 
 }
 
-void obtener_tablas(string matriz[50][50],string matriz_tabla1[50][50],string matriz_tabla2[50][50], int rango[3]) {
+void obtener_tablas(string matriz[50][50], string matriz_tabla1[50][50], string matriz_tabla2[50][50], int rango[3]) {
     //string matriz_tabla1[50][50];
     //string matriz_tabla2[50][50];
     string valoresC3[50];
@@ -108,15 +108,15 @@ void obtener_tablas(string matriz[50][50],string matriz_tabla1[50][50],string ma
             if (matriz[i][j] != "0") {
                 stringstream stream;
                 stringstream stream2;
-                stream << cont2+1;
+                stream << cont2 + 1;
                 matriz_tabla2[cont2][0] = stream.str();
                 matriz_tabla2[cont2][1] = matriz[i][j];
                 stream2 << j;
                 matriz_tabla2[cont2][2] = stream2.str();
                 cont2++;
             }
-            
-            
+
+
         }
     }
     //
@@ -127,13 +127,48 @@ void obtener_tablas(string matriz[50][50],string matriz_tabla1[50][50],string ma
 
 }
 
+string leer_palabra() {
+    string palabra;
+    string palabra2;
+    cin.getline((char*) palabra.c_str(), 256);
+    //cout << palabra.c_str() << endl;
+    palabra2 = palabra.c_str();
+    return palabra2.c_str();
+}
 
-void algoritmo_validar(string matriz[50][50],string matriz_tabla1[50][50],string matriz_tabla2[50][50], int rango[3],string palabra){
+int retornar_posicion(string letra, string matriz[50][50], int rango[3]) {
+
+    for (int j = 1; j < rango[1]; j++) {
+        if (letra == matriz[0][j]) {
+            return j;
+            break;
+        }
+    }
+}
+
+void algoritmo_validar(string matriz[50][50], string matriz_tabla1[50][50], string matriz_tabla2[50][50], int rango[3], string palabra) {
     
-//    for(int i=0;i<palabra.size();i++){
-//        cout <<palabra[i]<<endl;
-//    }
-    
+    string valores_palabra[50];
+    int val;
+    if (palabra == "") {
+        cout << "No se ha ingresado ninguna palabra" << endl;
+        
+    }
+    for (int i = 0; i < palabra.size(); i++) {
+        stringstream stream;
+        stream << palabra[i];
+        val = retornar_posicion(stream.str(), matriz, rango);
+
+        if (val != 0) {
+            stringstream valStr;
+            valStr << val;
+            valores_palabra[i] = valStr.str();
+        } else {
+            cout << "Palabra incorrecta" << endl;
+            break;
+        }
+    }
+
 }
 
 int main() {
@@ -142,25 +177,34 @@ int main() {
     string matriz_tabla2[50][50];
     string palabra;
     int rango[3];
+    
     obtener_matriz(matriz, rango);
-    obtener_tablas(matriz,matriz_tabla1,matriz_tabla2,rango);
-    
-    cout<<"Ingrese una palabra o frase:"<<endl;
-    cin>>stdlen((char*)palabra.c_str());
-    
-   
-    
+    obtener_tablas(matriz, matriz_tabla1, matriz_tabla2, rango);
+
+    cout << "Ingrese una palabra o frase:" << endl;
+    //string palabra(leer_palabra());
+    palabra = leer_palabra();
+
+    //cout << palabra.size()<<endl;
+    /*
     for(int i=0;i<palabra.size();i++){
         cout <<palabra[i]<<endl;
-    }
-    algoritmo_validar(matriz,matriz_tabla1,matriz_tabla2,rango,palabra);
-    
-    
-    /* for (int i = 0; i < rango[0]; i++) {
-        cout << matriz_tabla1[i][0]<<"  "<<matriz_tabla1[i][1] <<"  "<< matriz_tabla1[i][2]<< endl;
     }*/
+
+    algoritmo_validar(matriz, matriz_tabla1, matriz_tabla2, rango, palabra);
+
+
+    for (int i = 0; i < rango[0]; i++) {
+        cout << matriz_tabla1[i][0]<<"  "<<matriz_tabla1[i][1] <<"  "
+                << matriz_tabla1[i][2]<< endl;
+    }
+    
+      for (int i = 0; i < rango[2]; i++) {
+        cout << matriz_tabla2[i][0]<<"  "<<matriz_tabla2[i][1] <<"  "
+                << matriz_tabla2[i][2]<< endl;
+    }
     //cout <<"x= "<<rango[0]<<"y= "<<rango[1]<<endl;
-    /* for (int i = 0; i < rango[0]; i++) {
+    /*for (int i = 0; i < rango[0]; i++) {
          for (int j = 0; j < rango[1]; j++) {
              cout << "[" << i << "]" << "[" << j << "] => " << matriz[i][j] << "..." << endl;
          }
