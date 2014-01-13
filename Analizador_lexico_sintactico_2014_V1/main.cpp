@@ -2,16 +2,23 @@
 #include <fstream>
 #include <stdlib.h>
 #include <string.h>
-#include <sstream> 
-#include <string> 
+#include <list>
+#include <sstream>
+#include <string>
 #include<stdio.h>
 
 using namespace std;
 
-void obtener_matriz(string matriz[100][100], int rango[3]) {
+const int I = 100;
+const int J = 100;
+const int EXT_CADENA = 500;
+const int EXT_RANGO = 3;
+const int EXT_RESULTADOS = 50;
 
-    char cadena[250];
-    char cadenaAUX[250];
+void obtener_matriz(string matriz[I][J], int rango[EXT_RANGO]) {
+
+    char cadena[EXT_CADENA];
+    char cadenaAUX[EXT_CADENA];
     int column = 0;
     int fila = 0;
     int x = 0;
@@ -25,14 +32,14 @@ void obtener_matriz(string matriz[100][100], int rango[3]) {
         //donde se escribe la linea leida del csv
         //y se la lle nuevamente para ser almacenada en una fila de
         // la matriz
-        archivo_tabla.getline(cadena, 250, '\n');
-        ofstream archivo_aux("lectura_aux.txt");
+        archivo_tabla.getline(cadena, EXT_CADENA, '\n');
+        ofstream archivo_aux("temp.txt");
         archivo_aux << cadena << endl;
         archivo_aux.close();
-        ifstream archivo_aux_lec("lectura_aux.txt");
+        ifstream archivo_aux_lec("temp.txt");
         while (!archivo_aux_lec.eof()) {
             //hasta encontrar el ultimo ;
-            archivo_aux_lec.getline(cadenaAUX, 250, ';');
+            archivo_aux_lec.getline(cadenaAUX, EXT_CADENA, ';');
             string cadenaSTR(cadenaAUX);
             //se va llenando la matriz con cada linea
             matriz[fila][column] = cadenaSTR;
@@ -58,9 +65,8 @@ void obtener_matriz(string matriz[100][100], int rango[3]) {
 }
 
 //genera ambas tablas compactas a partir de la matriz inicial
-
-void obtener_tablas(string matriz[100][100], string matriz_tabla1[100][100], string matriz_tabla2[100][100], int rango[3]) {
-    string valoresC3[250];
+void obtener_tablas(string matriz[I][J], string matriz_tabla1[I][J], string matriz_tabla2[I][J], int rango[EXT_RANGO]) {
+    string valoresC3[EXT_CADENA];
     int cont = 0;
     ////////////// TABLA 1 ///////////////////
     //se completa c1 con un contador desde 1
@@ -144,8 +150,7 @@ string leer_palabra() {
 //este metodo recibe una letra y mediante recorrido por el alfabeto
 //que tambien se encuentra en la matriz principal,
 //devuelve su ubicacion segun la columna donde se encuentre
-
-int retornar_posicion(string letra, string matriz[100][100], int rango[3]) {
+int retornar_posicion(string letra, string matriz[I][J], int rango[EXT_RANGO]) {
     for (int j = 1; j < rango[1]; j++) {
         //solo recorre la fila 0 que es donde esta el alfabeto
         if (letra == matriz[0][j]) {
@@ -155,12 +160,9 @@ int retornar_posicion(string letra, string matriz[100][100], int rango[3]) {
     }
 }
 
-//metodo que permite interacccion entre las dos tablas, 
-//teniendo como fin el 
-//retorno de un valor que se utilizara 
+//metodo que permite interacccion entre las dos tablas, teniendo como fin el retorno de un valor que se utilizara 
 //en el proximo ciclo 
-
-int recuperar_valor(int valor, int verificador, int retorno, string matriz_tabla1[100][100], string matriz_tabla2[100][100], int rango[3]) {
+int recuperar_valor(int valor, int verificador, int retorno, string matriz_tabla1[I][J], string matriz_tabla2[I][J], int rango[EXT_RANGO]) {
 
     //verificador indica si es la primera vuelta o si ya se han ejecutado otras anteriores
     //cero indica q es la primera
@@ -198,22 +200,25 @@ int recuperar_valor(int valor, int verificador, int retorno, string matriz_tabla
     }
 }
 
-void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], string matriz_tabla2[100][100], int rango[3], string palabra) {
+void algoritmo_validar(string matriz[I][J], string matriz_tabla1[I][J], string matriz_tabla2[I][J], int rango[EXT_RANGO], string palabra) {
 
-    string valores_palabra[100];
+    string valores_palabra[EXT_CADENA];
     int posicion;
-    int contFinal = 1;
-    int resultados[100];
+    int contFinal = 0;
+    int resultados[EXT_RESULTADOS];
+
     //En caso de q no se haya ingresado nada
     if (palabra == "" || palabra == " " || palabra == "\t") {
         cout << "\nError: No se ha ingresado ninguna cadena\n" << endl;
         exit(0);
     }
+
     for (int i = 0; i < palabra.size(); i++) {
         //conversion char -> string
         stringstream stream_caracter;
         stream_caracter << palabra[i];
         posicion = retornar_posicion(stream_caracter.str(), matriz, rango);
+
         //si se retorna una posicion distinta a cero
         if (posicion != 0) {
             //conversion int -> string
@@ -222,6 +227,8 @@ void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], 
             valores_palabra[i] = stream_posicion.str();
             //este contador se usara para luego recorrer el arreglo
             contFinal++;
+
+
         } else {
             //en caso de retornar cero muestra mensaje de error y
             //termina el programa
@@ -230,9 +237,9 @@ void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], 
             break;
         }
     }
+
     //contFinal guarda extension de la palabra
-    //valores_palabra[i] contiene la lista de 
-    //numeros de cada caracter de la palbra ingresada
+    //valores_palabra[i] contiene la lista de numeros de cada caracter de la palbra ingresada
     int retorno = 0;
     int verificador = 0;
     int cont = 0;
@@ -249,20 +256,15 @@ void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], 
             verificador = 0;
             retorno = 0;
         }
-        //si en los resultados se encuentra un cero presenta error 
-        //y termina la ejecucion
-        /*
-         * if (resultados[cont] == 0) {
-        *    cout << "\nError: Cadena incorrecta\n" << endl;
-        *    exit(0);
-        *     break;
-        *   }
-         */
+        if (resultados[cont] == 0) {
+
+            break;
+        }
         cont++;
 
     }
 
-    //en caso de existir un token al final del arreglo
+    //en caso de existir un cero al final del arreglo
     if (resultados[cont - 1] < 0) {
         //para evaluar si existe algun valor con cero
         //entonces se presenta mensaje y finaliza el programa
@@ -282,7 +284,6 @@ void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], 
         }
         cout << "\n" << endl;
     } else {
-        //presenta error en caso de encontrar el token final
         cout << "\nError: Cadena incorrecta\n" << endl;
         exit(0);
     }
@@ -290,8 +291,20 @@ void algoritmo_validar(string matriz[100][100], string matriz_tabla1[100][100], 
 
 }
 
-void presentar_tablas(string matriz[100][100], string matriz_tabla1[100][100], string matriz_tabla2[100][100], int rango[3]) {
-    cout << "********************* TABLA DE TRANSICIONES *********************\n" << endl;
+string elim_espacios_finales(string cadena) {
+    int pos_ini = 0;
+    int longitud;
+    int tam_cadena = 0;
+    tam_cadena = cadena.size() - 1;
+    while (cadena[tam_cadena] == ' '||cadena[tam_cadena] == '\t') {
+        tam_cadena--;
+    }
+    longitud = tam_cadena - pos_ini + 1;
+    return cadena.substr(pos_ini, longitud);
+}
+
+void presentar_tablas(string matriz[I][J], string matriz_tabla1[I][J], string matriz_tabla2[I][J], int rango[EXT_RANGO]) {
+    cout << "********************************** TABLA DE TRANSICIONES **********************************\n" << endl;
     for (int i = 1; i < rango[0]; i++) {
         for (int j = 1; j < rango[1]; j++) {
 
@@ -301,12 +314,12 @@ void presentar_tablas(string matriz[100][100], string matriz_tabla1[100][100], s
     }
 
     printf("\n");
-    cout << "******* TABLA 1 *******\n" << endl;
+    cout << "***** TABLA 1 *****\n" << endl;
     for (int i = 0; i < rango[0] - 1; i++) {
         cout << matriz_tabla1[i][0].c_str() << "\t" << matriz_tabla1[i][1].c_str() << "\t" << matriz_tabla1[i][2].c_str() << "\n";
     }
     cout << "\n" << endl;
-    cout << "******* TABLA 2 *******\n" << endl;
+    cout << "***** TABLA 2 *****\n" << endl;
     for (int i = 0; i < rango[2]; i++) {
         cout << matriz_tabla2[i][0].c_str() << "\t" << matriz_tabla2[i][1].c_str() << "\t" << matriz_tabla2[i][2].c_str() << "\n";
     }
@@ -314,34 +327,29 @@ void presentar_tablas(string matriz[100][100], string matriz_tabla1[100][100], s
 }
 
 int main() {
-    string matriz[100][100];
-    string matriz_tabla1[100][100];
-    string matriz_tabla2[100][100];
+    string matriz[I][J];
+    string matriz_tabla1[I][J];
+    string matriz_tabla2[I][J];
     string palabra;
-    int rango[3];
+    int rango[EXT_RANGO];
 
     obtener_matriz(matriz, rango);
     obtener_tablas(matriz, matriz_tabla1, matriz_tabla2, rango);
     presentar_tablas(matriz, matriz_tabla1, matriz_tabla2, rango);
 
-    cout << "Ingrese una palabra o frase:\n" << endl;
-    cout << ">>  ";
-    palabra = leer_palabra();
+    cout << "Ingrese una palabra o frase: \n\n>>  ";
+    
+    //quitamos el exceso de espacios finales en caso
+    //de que hayan sido agregados
+    palabra = elim_espacios_finales(leer_palabra());
 
-    //en caso de q no se ingrese un espacio o tabulador al final
-    char palabra_aux = palabra[palabra.size() - 1];
-    //conversion char -> string
-    stringstream stream_palabra_aux;
-    stream_palabra_aux << palabra_aux;
-    if (stream_palabra_aux.str() != " " && stream_palabra_aux.str() != "        ") {
-        //concatenacion agregando un espacio en blanco
-        stringstream stream_concat;
-        stream_concat << palabra.c_str() << " ";
-        palabra = stream_concat.str();
-        algoritmo_validar(matriz, matriz_tabla1, matriz_tabla2, rango, palabra);
-    } else {
-        algoritmo_validar(matriz, matriz_tabla1, matriz_tabla2, rango, palabra);
-    }
+
+    //agregando un espacio en blanco al final
+    // para ejecución correcta
+    stringstream stream_concat;
+    stream_concat << palabra.c_str() << " ";
+    palabra = stream_concat.str();
+    algoritmo_validar(matriz, matriz_tabla1, matriz_tabla2, rango, palabra);
 }
 
 
